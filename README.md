@@ -2,6 +2,19 @@
 
 Get commute times on the command line!
 
+- Get commuting time between locations.
+- Name and add your frequent locations for easier access.
+
+## Install
+
+If you have a working Go installation, you can install `commuter` like so:
+
+```sh
+$ go get github.com/KyleBanks/commuter
+```
+
+Otherwise, download `commuter` from the [Releases](./releases) page.
+
 ## Usage
 
 The first time you run commuter, you'll be prompted to provide a [Google Maps API Key](https://developers.google.com/maps/documentation/geocoding/get-api-key) and default location:
