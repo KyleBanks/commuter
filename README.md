@@ -34,11 +34,11 @@ The API key and default location will be stored locally, and are never sent to a
 Next, request your commute time:
 
 ```sh
-# Default to a location
+# From your default to a specific location:
 $ commuter -to "321 Maple Ave. Toronto, Ontario"
 > 32 Minutes
 
-# A location to your default
+# From a specific location to your default:
 $ commuter -from "Toronto, Ontario"
 > 20 Minutes
 ```
