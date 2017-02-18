@@ -59,7 +59,7 @@ func parseConfigureCmd(s storage.Provider) *ConfigureCmd {
 // parseCommuteCmd parses and returns a CommuteCmd.
 func parseCommuteCmd() *CommuteCmd {
 	var c CommuteCmd
-	flag.StringVar(&c.From, "from", "default", "The starting point of your commute.")
+	flag.StringVar(&c.From, "from", DefaultLocationAlias, "The starting point of your commute.")
 	flag.StringVar(&c.To, "to", "", "The destination of your commute.")
 	flag.Parse()
 
