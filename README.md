@@ -23,7 +23,7 @@ $ go get github.com/KyleBanks/commuter
 
 The first time you run `commuter`, you'll be prompted to provide a [Google Maps API Key](https://developers.google.com/console) and default location. 
 
-**Important:** Ensure you enable the `Google Maps Distance Matrix API` at [https://developers.google.com/console](https://developers.google.com/console)!
+**Important:** Ensure you enable the *Google Maps Distance Matrix API* at [https://developers.google.com/console](https://developers.google.com/console).
 
 ```sh
 $ commuter
