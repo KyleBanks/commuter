@@ -1,4 +1,4 @@
-![Commuter](./_misc/commuter.png)
+![Commuter](./_misc/commuter-small.png)
 
 [![Build Status](https://travis-ci.org/KyleBanks/commuter.svg?branch=master)](https://travis-ci.org/KyleBanks/commuter) &nbsp;
 [![GoDoc](https://godoc.org/github.com/KyleBanks/commuter?status.svg)](https://godoc.org/github.com/KyleBanks/commuter) &nbsp;
