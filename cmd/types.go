@@ -1,8 +1,4 @@
-package main
-
-import (
-	"github.com/KyleBanks/commuter/pkg/storage"
-)
+package cmd
 
 // Runner defines a type that can be Run.
 type Runner interface {
@@ -34,6 +30,12 @@ type Scanner interface {
 	Text() string
 }
 
+// StorageProvider defines a type that can be used for storage.
+type StorageProvider interface {
+	Load(interface{}) error
+	Save(interface{}) error
+}
+
 // Configuration represents a Commuter configuration, including
 // the Google Maps API Key and location map.
 type Configuration struct {
@@ -45,7 +47,7 @@ type Configuration struct {
 //
 // If an error occurs, the configuration is assumed to be corrupted and a nil
 // Configuration is returned.
-func NewConfiguration(s storage.Provider) *Configuration {
+func NewConfiguration(s StorageProvider) *Configuration {
 	var c Configuration
 	err := s.Load(&c)
 	if err != nil {

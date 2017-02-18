@@ -1,33 +1,50 @@
-package main
+package cmd
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/KyleBanks/commuter/pkg/geo"
-	"github.com/KyleBanks/commuter/pkg/storage"
 )
 
 const (
 	// DefaultLocationAlias is the name of the default alias
 	// used for 'From' addresses when one is not provided.
 	DefaultLocationAlias string = "default"
+
+	// MsgGoogleMapsAPIKeyPrompt is used to prompt the user to enter their Google Maps API Key.
+	MsgGoogleMapsAPIKeyPrompt = "Enter Google Maps API Key: (developers.google.com/console)"
+	// MsgDefaultLocationPrompt is used to prompt the user to enter their default location.
+	MsgDefaultLocationPrompt = "Enter Your Default Location: (ex. 123 Main St. Toronto, Canada)"
+)
+
+var (
+	// ErrDefaultFromMissing is returned when running the default command the the -from arugment is missing.
+	ErrDefaultFromMissing = errors.New("missing -from parameter")
+	// ErrDefaultToMissing is returned when running the default command the the -to arugment is missing.
+	ErrDefaultToMissing = errors.New("missing -to parameter")
+
+	// ErrAddNameMissing is returned when running the add command the the -name arugment is missing.
+	ErrAddNameMissing = errors.New("missing -name parameter")
+	// ErrAddLocationMissing is returned when running the add command the the -location arugment is missing.
+	ErrAddLocationMissing = errors.New("missing -location parameter")
 )
 
 // ConfigureCmd is used to configure the commuter application
 type ConfigureCmd struct {
 	Input Scanner
-	Store storage.Provider
+	Store StorageProvider
 }
 
 // Run prompts the user to configure the commuter application.
 func (c *ConfigureCmd) Run(conf *Configuration, i Indicator) error {
 	conf = &Configuration{
-		APIKey: c.promptForString(i, msgGoogleMapsAPIKeyPrompt),
+		APIKey: c.promptForString(i, MsgGoogleMapsAPIKeyPrompt),
 
 		Locations: map[string]string{
-			DefaultLocationAlias: c.promptForString(i, msgDefaultLocationPrompt),
+			DefaultLocationAlias: c.promptForString(i, MsgDefaultLocationPrompt),
 		},
 	}
 
@@ -71,6 +88,8 @@ type CommuteCmd struct {
 // Run calculates the distance between the From and To locations,
 // and outputs the result.
 func (c *CommuteCmd) Run(conf *Configuration, i Indicator) error {
+	// TODO: This is too tightly coupled, it would be preferrable to
+	// pass the router interface.
 	r, err := geo.NewRouter(conf.APIKey)
 	if err != nil {
 		return err
@@ -106,7 +125,6 @@ func (c *CommuteCmd) format(d time.Duration) string {
 	if minutes != 1 {
 		suffix = "s"
 	}
-
 	out = append(out, fmt.Sprintf("%v Minute%v", minutes, suffix))
 
 	return strings.Join(out, " ")
@@ -122,10 +140,10 @@ func (c *CommuteCmd) Validate(conf *Configuration) error {
 	}
 
 	if len(c.From) == 0 {
-		return errDefaultFromMissing
+		return ErrDefaultFromMissing
 	}
 	if len(c.To) == 0 {
-		return errDefaultToMissing
+		return ErrDefaultToMissing
 	}
 
 	return nil
@@ -141,7 +159,7 @@ type AddCmd struct {
 	Name  string
 	Value string
 
-	Store storage.Provider
+	Store StorageProvider
 }
 
 // Run adds the named location, overwriting the existing value if necessary.
@@ -153,10 +171,10 @@ func (a *AddCmd) Run(conf *Configuration, i Indicator) error {
 // Validate validates the AddCmd is properly initialized and ready to be Run.
 func (a *AddCmd) Validate(conf *Configuration) error {
 	if len(a.Name) == 0 {
-		return errAddNameMissing
+		return ErrAddNameMissing
 	}
 	if len(a.Value) == 0 {
-		return errAddLocationMissing
+		return ErrAddLocationMissing
 	}
 
 	return nil

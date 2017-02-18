@@ -6,12 +6,6 @@ import (
 	"io/ioutil"
 )
 
-// Provider defines a type that can be used for storage.
-type Provider interface {
-	Load(interface{}) error
-	Save(interface{}) error
-}
-
 // FileStore represents a simple on-disk file storage system.
 type FileStore struct {
 	Filename string

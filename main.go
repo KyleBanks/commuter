@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/KyleBanks/commuter/cli"
+	"github.com/KyleBanks/commuter/cmd"
 	"github.com/KyleBanks/commuter/pkg/storage"
 )
 
@@ -11,10 +13,10 @@ const (
 )
 
 func main() {
-	var out Stdout
+	out := cli.NewStdout()
 	store := storage.NewFileStore(configurationFileName)
-	conf := NewConfiguration(store)
-	parser := NewArgParser(os.Args[1:])
+	conf := cmd.NewConfiguration(store)
+	parser := cli.NewArgParser(os.Args[1:])
 
 	r, err := parser.Parse(conf, store)
 	if err != nil {
@@ -25,7 +27,7 @@ func main() {
 }
 
 // exec executes a Runner with the Indicator and Configuration provided.
-func exec(i Indicator, c *Configuration, r RunnerValidator) {
+func exec(i cmd.Indicator, c *cmd.Configuration, r cmd.RunnerValidator) {
 	if err := r.Validate(c); err != nil {
 		i.Indicatef("Invalid command: %v", r)
 		i.Indicatef("Error: %v", err)

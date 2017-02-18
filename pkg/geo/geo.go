@@ -56,11 +56,10 @@ func (r *Router) Duration(from, to string) (*time.Duration, error) {
 
 	for _, row := range res.Rows {
 		for _, el := range row.Elements {
-			if el.Status == statusNotFound {
+			switch el.Status {
+			case statusNotFound:
 				return nil, ErrBadLocation
-			}
-
-			if el.Status == statusOk {
+			case statusOk:
 				return &el.Duration, nil
 			}
 		}
