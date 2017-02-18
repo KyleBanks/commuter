@@ -51,7 +51,7 @@ func TestFileStore_LoadAndSave(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if sample.Test != expect {
+	if sample.Test.Unix() != expect.Unix() {
 		t.Fatalf("Unexpected result, expected=%v, got=%v", expect, sample.Test)
 	}
 }
