@@ -10,9 +10,3 @@ import (
 type Communicator interface {
 	DistanceMatrix(context.Context, *maps.DistanceMatrixRequest) (*maps.DistanceMatrixResponse, error)
 }
-
-// Route represents a request between two locations.
-type Route struct {
-	From string
-	To   string
-}

@@ -38,10 +38,10 @@ func NewRouter(apiKey string) (*Router, error) {
 
 // Duration returns the time it will take to travel between
 // the From and To address.
-func (r *Router) Duration(route Route) (*time.Duration, error) {
+func (r *Router) Duration(from, to string) (*time.Duration, error) {
 	req := maps.DistanceMatrixRequest{
-		Origins:      []string{route.From},
-		Destinations: []string{route.To},
+		Origins:      []string{from},
+		Destinations: []string{to},
 	}
 
 	res, err := r.client.DistanceMatrix(context.Background(), &req)

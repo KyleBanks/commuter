@@ -1,26 +1,77 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"flag"
 
-	"github.com/KyleBanks/commuter/pkg/geo"
+	"github.com/KyleBanks/commuter/pkg/storage"
+)
+
+const (
+	configurationFileName string = "commuter.conf"
 )
 
 func main() {
-	key := os.Getenv("GMAPS")
-	r, err := geo.NewRouter(key)
-	if err != nil {
-		panic(err)
+	var out Logger
+	store := storage.FileStore{
+		Filename: configurationFileName,
+	}
+	conf := loadConfig(store)
+
+	var r Runner
+	if conf == nil {
+		r = parseConfigureCmd(store)
+	} else {
+		r = parseCmd()
 	}
 
-	d, err := r.Duration(geo.Route{
-		From: "123 Main St.",
-		To:   "321 Maple Ave.",
-	})
+	exec(out, conf, r)
+}
+
+// loadConfig attempts to load commuter configuration from the
+// provided storage Provider.
+//
+// If an error occurs, the configuration is deemed corrupt and
+// nil is returned.
+func loadConfig(s storage.Provider) *Configuration {
+	var c Configuration
+	err := s.Load(&c)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
-	fmt.Println(d)
+	return &c
+}
+
+// parseCmd attempts to determine which command is being executed,
+// parse its flags, and return it.
+func parseCmd() Runner {
+	return parseCommuteCmd()
+}
+
+// parseConfigureCmd parses and returns a ConfigureCmd.
+func parseConfigureCmd(s storage.Provider) *ConfigureCmd {
+	return &ConfigureCmd{
+		input: newStdin(),
+		store: s,
+	}
+}
+
+// parseCommuteCmd parses and returns a CommuteCmd.
+func parseCommuteCmd() *CommuteCmd {
+	var c CommuteCmd
+	flag.StringVar(&c.From, "from", "default", "The starting point of your commute.")
+	flag.StringVar(&c.To, "to", "", "The destination of your commute.")
+	flag.Parse()
+
+	return &c
+}
+
+// exec executes a Runner with the Indicator and Configuration provided.
+func exec(i Indicator, c *Configuration, r Runner) {
+	err := r.Run(i)
+
+	if err != nil {
+		i.Indicatef("Command Failed:\n%v", c)
+		i.Indicatef("Error:\n%v", err)
+	}
 }

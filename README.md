@@ -15,6 +15,8 @@ $ go get github.com/KyleBanks/commuter
 
 Otherwise, download `commuter` from the [Releases](https://github.com/KyleBanks/commuter/releases) page.
 
+Run `commuter -help` to ensure you have properly installed the application.
+
 ## Usage
 
 The first time you run `commuter`, you'll be prompted to provide a [Google Maps API Key](https://developers.google.com/console) and default location. 
@@ -33,22 +35,22 @@ The API key and default location will be stored locally, and are never sent to a
 Next, request your commute time:
 
 ```sh
-$ commuter --to 321 Maple Ave. Toronto, Ontario
+$ commuter --to "321 Maple Ave. Toronto, Ontario"
 > 32 Minutes
 ```
 
 If you want a commute time beginning somewhere other than your default location, you can use the `--from` flag:
 
 ```sh
-$ commuter --from 123 Main St. Toronto, Ontario --to 321 Maple Ave. Toronto, Ontario
+$ commuter --from "123 Main St. Toronto, Ontario" --to "321 Maple Ave. Toronto, Ontario"
 > 32 Minutes
 ```
 
 You can also add names for your frequent locations like so:
 
 ```sh
-$ commuter add --name home --address 123 Main St. Toronto, Ontario
-$ commuter add --name work --address 321 Maple Ave. Toronto, Ontario
+$ commuter add --name home --address "123 Main St. Toronto, Ontario"
+$ commuter add --name work --address "321 Maple Ave. Toronto, Ontario"
 ```
 
 And use them as the `from` and/or `to` address:
