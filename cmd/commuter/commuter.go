@@ -51,8 +51,8 @@ func parseCmd() Runner {
 // parseConfigureCmd parses and returns a ConfigureCmd.
 func parseConfigureCmd(s storage.Provider) *ConfigureCmd {
 	return &ConfigureCmd{
-		input: newStdin(),
-		store: s,
+		Input: newStdin(),
+		Store: s,
 	}
 }
 
@@ -68,10 +68,10 @@ func parseCommuteCmd() *CommuteCmd {
 
 // exec executes a Runner with the Indicator and Configuration provided.
 func exec(i Indicator, c *Configuration, r Runner) {
-	err := r.Run(i)
+	err := r.Run(c, i)
 
 	if err != nil {
-		i.Indicatef("Command Failed:\n%v", c)
+		i.Indicatef("Command Failed: %v", r)
 		i.Indicatef("Error:\n%v", err)
 	}
 }
