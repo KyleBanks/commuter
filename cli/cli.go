@@ -25,13 +25,13 @@ const (
 
 // Stdout provides an output mechanism to notify the user via stdout.
 type Stdout struct {
-	out io.Writer
+	io.Writer
 }
 
 // NewStdout initializes and returns a new Stdout.
 func NewStdout() Stdout {
 	return Stdout{
-		out: os.Stdout,
+		Writer: os.Stdout,
 	}
 }
 
@@ -42,7 +42,7 @@ func (s Stdout) Indicate(v interface{}) {
 
 // Indicatef prints an indication to the user with formatting.
 func (s Stdout) Indicatef(msg string, args ...interface{}) {
-	fmt.Fprintf(s.out, "%v\n", fmt.Sprintf(msg, args...))
+	fmt.Fprintf(s, "%v\n", fmt.Sprintf(msg, args...))
 }
 
 // Stdin provides an input mechanism for the user via the command line.
