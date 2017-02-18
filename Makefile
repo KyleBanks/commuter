@@ -1,6 +1,6 @@
 # Build and run the commuter CLI.
 commuter:
-	@go build github.com/KyleBanks/commuter/cmd/commuter
+	@go build github.com/KyleBanks/commuter/cmd/commuter 
 .PHONY: commuter
 
 # Runs an example commuter request for travel duration.

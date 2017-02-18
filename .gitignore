@@ -24,7 +24,8 @@ _testmain.go
 *.prof
 
 commuter
+!cmd/commuter/
 .secret
-*.conf
+commuter.conf
 manifest.json
 lock.json
