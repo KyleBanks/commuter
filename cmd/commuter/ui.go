@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -13,17 +14,25 @@ const (
 	msgGoogleMapsAPIKeyPrompt = "Enter Google Maps API Key: (developers.google.com/console)"
 	msgDefaultLocationPrompt  = "Enter Your Default Location: (ex. 123 Main St. Toronto, Canada)"
 
-	cmdDefault       string = "commuter"
-	defaultFromParam string = "from"
-	defaultFromUsage string = `The starting point of your commute, either a named location [ex. "work"] or an address [ex. "123 Main St. Toronto, Canada"].`
-	defaultToParam   string = "to"
-	defaultToUsage   string = `The destination of your commute, either a named location [ex. "work"] or an address [ex. "123 Main St. Toronto, Canada"].`
+	cmdDefault       = "commuter"
+	defaultFromParam = "from"
+	defaultFromUsage = `The starting point of your commute, either a named location [ex. "work"] or an address [ex. "123 Main St. Toronto, Canada"].`
+	defaultToParam   = "to"
+	defaultToUsage   = `The destination of your commute, either a named location [ex. "work"] or an address [ex. "123 Main St. Toronto, Canada"].`
 
-	cmdAdd           string = "add"
-	addNameParam     string = "name"
-	addNameUsage     string = `The name of the location you'd like to add [ex. "work"]. (required)`
-	addLocationParam string = "location"
-	addLocationUsage string = `The location to be added [ex. "123 Main St. Toronto, Canada"]. (required)`
+	cmdAdd           = "add"
+	addNameParam     = "name"
+	addNameUsage     = `The name of the location you'd like to add [ex. "work"]. (required)`
+	addLocationParam = "location"
+	addLocationUsage = `The location to be added [ex. "123 Main St. Toronto, Canada"]. (required)`
+)
+
+var (
+	errDefaultFromMissing = errors.New("missing '-" + defaultFromParam + "' parameter")
+	errDefaultToMissing   = errors.New("missing '-" + defaultToParam + "' parameter")
+
+	errAddNameMissing     = errors.New("missing '-" + addNameParam + "' parameter")
+	errAddLocationMissing = errors.New("missing '-" + addLocationParam + "' parameter")
 )
 
 // Stdout provides an output mechanism to notify the user via stdout.
@@ -65,7 +74,7 @@ func NewArgParser(args []string) *ArgParser {
 
 // Parse attempts to determine which command is being executed,
 // parse its flags, and return it.
-func (a *ArgParser) Parse(conf *Configuration, s storage.Provider) (Runner, error) {
+func (a *ArgParser) Parse(conf *Configuration, s storage.Provider) (RunnerValidator, error) {
 	if conf == nil || len(a.Args) == 0 {
 		return a.parseConfigureCmd(s)
 	}

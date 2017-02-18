@@ -10,13 +10,18 @@ import (
 )
 
 const (
-	statusOk string = "OK"
+	statusOk       string = "OK"
+	statusNotFound string = "NOT_FOUND"
 )
 
 var (
-	// ErrUnknown is returned in cases where the underlying Google Maps API
+	// ErrUnavailable is returned in cases where the underlying Google Maps API
 	// did not return an error, but an unexpected response was received.
-	ErrUnknown = errors.New("an unknown error occurred")
+	ErrUnavailable = errors.New("duration unavailable")
+
+	// ErrBadLocation is returned in cases where either the 'from' or 'to' address
+	// could not be found.
+	ErrBadLocation = errors.New("failed to find one of the provided locations")
 )
 
 // Router provides the ability to calculate travel duration between Routes.
@@ -51,11 +56,15 @@ func (r *Router) Duration(from, to string) (*time.Duration, error) {
 
 	for _, row := range res.Rows {
 		for _, el := range row.Elements {
+			if el.Status == statusNotFound {
+				return nil, ErrBadLocation
+			}
+
 			if el.Status == statusOk {
 				return &el.Duration, nil
 			}
 		}
 	}
 
-	return nil, ErrUnknown
+	return nil, ErrUnavailable
 }

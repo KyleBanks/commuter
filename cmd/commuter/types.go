@@ -9,6 +9,17 @@ type Runner interface {
 	Run(*Configuration, Indicator) error
 }
 
+// Validator defines a type that can be validated.
+type Validator interface {
+	Validate(*Configuration) error
+}
+
+// RunnerValidator defines a type that can be Run and Validated.
+type RunnerValidator interface {
+	Runner
+	Validator
+}
+
 // Indicator defines a type that can provide UI indications
 // to the user.
 type Indicator interface {

@@ -32,6 +32,11 @@ func (c *ConfigureCmd) Run(conf *Configuration, i Indicator) error {
 	return c.Store.Save(&conf)
 }
 
+// Validate validates the ConfigureCmd is properly initialized and ready to be Run.
+func (c *ConfigureCmd) Validate(conf *Configuration) error {
+	return nil
+}
+
 // promptForString prompts the user for a string input.
 func (c *ConfigureCmd) promptForString(i Indicator, msg string) string {
 	i.Indicate(msg)
@@ -69,6 +74,17 @@ func (c *CommuteCmd) Run(conf *Configuration, i Indicator) error {
 		return err
 	}
 
+	d, err := r.Duration(c.From, c.To)
+	if err != nil {
+		return err
+	}
+
+	i.Indicate(d)
+	return nil
+}
+
+// Validate validates the CommuteCmd is properly initialized and ready to be Run.
+func (c *CommuteCmd) Validate(conf *Configuration) error {
 	if val, ok := conf.Locations[c.From]; ok {
 		c.From = val
 	}
@@ -76,12 +92,13 @@ func (c *CommuteCmd) Run(conf *Configuration, i Indicator) error {
 		c.To = val
 	}
 
-	d, err := r.Duration(c.From, c.To)
-	if err != nil {
-		return err
+	if len(c.From) == 0 {
+		return errDefaultFromMissing
+	}
+	if len(c.To) == 0 {
+		return errDefaultToMissing
 	}
 
-	i.Indicate(d)
 	return nil
 }
 
@@ -102,6 +119,18 @@ type AddCmd struct {
 func (a *AddCmd) Run(conf *Configuration, i Indicator) error {
 	conf.Locations[a.Name] = a.Value
 	return a.Store.Save(conf)
+}
+
+// Validate validates the AddCmd is properly initialized and ready to be Run.
+func (a *AddCmd) Validate(conf *Configuration) error {
+	if len(a.Name) == 0 {
+		return errAddNameMissing
+	}
+	if len(a.Value) == 0 {
+		return errAddLocationMissing
+	}
+
+	return nil
 }
 
 // String returns a string representation of the AddCmd.
