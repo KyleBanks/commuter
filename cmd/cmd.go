@@ -1,3 +1,4 @@
+// Package cmd contains the core logic of commuter.
 package cmd
 
 import (
@@ -12,12 +13,15 @@ import (
 const (
 	// DefaultLocationAlias is the name of the default alias
 	// used for 'From' addresses when one is not provided.
-	DefaultLocationAlias string = "default"
+	DefaultLocationAlias = "default"
+
+	// promptPrefix is the prefix using when prompting a user for input.
+	promptPrefix = "> "
 
 	// MsgGoogleMapsAPIKeyPrompt is used to prompt the user to enter their Google Maps API Key.
-	MsgGoogleMapsAPIKeyPrompt = "Enter Google Maps API Key: (developers.google.com/console)"
+	MsgGoogleMapsAPIKeyPrompt = promptPrefix + "Enter Google Maps API Key: (developers.google.com/console)"
 	// MsgDefaultLocationPrompt is used to prompt the user to enter their default location.
-	MsgDefaultLocationPrompt = "Enter Your Default Location: (ex. 123 Main St. Toronto, Canada)"
+	MsgDefaultLocationPrompt = promptPrefix + "Enter Your Default Location: (ex. 123 Main St. Toronto, Canada)"
 )
 
 var (

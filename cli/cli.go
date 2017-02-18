@@ -1,3 +1,5 @@
+// Package cli provides access to commuter over the command line via Stdin, Stdout,
+// and command line arguments.
 package cli
 
 import (
@@ -40,7 +42,7 @@ func (s Stdout) Indicate(v interface{}) {
 
 // Indicatef prints an indication to the user with formatting.
 func (s Stdout) Indicatef(msg string, args ...interface{}) {
-	fmt.Fprintf(s.out, "> %v\n", fmt.Sprintf(msg, args...))
+	fmt.Fprintf(s.out, "%v\n", fmt.Sprintf(msg, args...))
 }
 
 // Stdin provides an input mechanism for the user via the command line.
