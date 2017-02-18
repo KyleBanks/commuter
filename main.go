@@ -9,12 +9,13 @@ import (
 )
 
 const (
-	configurationFileName string = "commuter.conf"
+	configurationFileName string = "config.json"
+	configurationDirName  string = "commuter"
 )
 
 func main() {
 	out := cli.NewStdout()
-	store := storage.NewFileStore(configurationFileName)
+	store := storage.NewFileStore(configurationDirName, configurationFileName)
 	conf := cmd.NewConfiguration(store)
 	parser := cli.NewArgParser(os.Args[1:])
 
