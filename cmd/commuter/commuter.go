@@ -11,7 +11,7 @@ const (
 )
 
 func main() {
-	var out Logger
+	var out Stdout
 	store := storage.FileStore{
 		Filename: configurationFileName,
 	}

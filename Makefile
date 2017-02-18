@@ -1,7 +1,7 @@
 # Build and run the commuter CLI.
 commuter:
 	@go build github.com/KyleBanks/commuter/cmd/commuter
-	@./commuter -help
+	@./commuter -to "Toronto, Canada"
 .PHONY: commuter
 
 # Runs test suit, vet, golint, and fmt.
