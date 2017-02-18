@@ -23,9 +23,10 @@ The first time you run `commuter`, you'll be prompted to provide a [Google Maps 
 
 ```sh
 $ commuter
-(https://developers.google.com/maps/documentation/geocoding/get-api-key)
-> Enter Google Maps API Key: 123APIKEY456
-> Enter Default Location: 123 Main St. Toronto, Ontario
+> Enter Google Maps API Key: (developers.google.com/console)
+123APIKEY456
+> Enter Your Default Location: (ex. 123 Main St. Toronto, Canada)
+123 Main St. Toronto, Ontario
 ```
 
 The API key and default location will be stored locally, and are never sent to any remote services aside from the official Google Maps API. The default location is then used by default when a `-from` or `-to` location is not provided.
