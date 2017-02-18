@@ -13,11 +13,13 @@ If you have a working Go installation, you can install `commuter` like so:
 $ go get github.com/KyleBanks/commuter
 ```
 
-Otherwise, download `commuter` from the [Releases](./releases) page.
+Otherwise, download `commuter` from the [Releases](https://github.com/KyleBanks/commuter/releases) page.
 
 ## Usage
 
-The first time you run commuter, you'll be prompted to provide a [Google Maps API Key](https://developers.google.com/maps/documentation/geocoding/get-api-key) and default location:
+The first time you run `commuter`, you'll be prompted to provide a [Google Maps API Key](https://developers.google.com/console) and default location. 
+
+**Important:** Ensure you enable the `Google Maps Distance Matrix API` at [https://developers.google.com/console](https://developers.google.com/console)!
 
 ```sh
 $ commuter
@@ -59,4 +61,5 @@ $ commuter --from home --to work
 ## Roadmap
 
 - Use geolocation to allow requesting commute time from current location (ex. `commuter -c --to 123 Main St.`) where `-c` denotes to use the current location.
+- Allow for alternative modes of transportation (default is driving) via `--drive`, `--walk`, `--bike`, and `--transit` flags.
 

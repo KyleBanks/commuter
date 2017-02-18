@@ -1,9 +1,26 @@
 package main
 
 import (
-	_ "googlemaps.github.io/maps"
+	"fmt"
+	"os"
+
+	"github.com/KyleBanks/commuter/pkg/geo"
 )
 
 func main() {
-	println("Hello, World")
+	key := os.Getenv("GMAPS")
+	r, err := geo.NewRouter(key)
+	if err != nil {
+		panic(err)
+	}
+
+	d, err := r.Duration(geo.Route{
+		From: "123 Main St.",
+		To:   "321 Maple Ave.",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(d)
 }
