@@ -2,10 +2,10 @@
 package geo
 
 import (
-	"context"
 	"errors"
 	"time"
 
+	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
 
