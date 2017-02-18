@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/KyleBanks/commuter/cmd"
+	"github.com/KyleBanks/commuter/pkg/geo"
 )
 
 // ArgParser parses input arguments from the command line.
@@ -30,7 +31,7 @@ func (a *ArgParser) Parse(conf *cmd.Configuration, s cmd.StorageProvider) (cmd.R
 		return a.parseAddCmd(s, a.Args[1:])
 	}
 
-	return a.parseCommuteCmd(a.Args)
+	return a.parseCommuteCmd(conf, a.Args)
 }
 
 // parseConfigureCmd parses and returns a ConfigureCmd.
@@ -42,8 +43,13 @@ func (a *ArgParser) parseConfigureCmd(s cmd.StorageProvider) (*cmd.ConfigureCmd,
 }
 
 // parseCommuteCmd parses and returns a CommuteCmd from user supplied flags.
-func (a *ArgParser) parseCommuteCmd(args []string) (*cmd.CommuteCmd, error) {
-	var c cmd.CommuteCmd
+func (a *ArgParser) parseCommuteCmd(conf *cmd.Configuration, args []string) (*cmd.CommuteCmd, error) {
+	r, err := geo.NewRouter(conf.APIKey)
+	if err != nil {
+		return nil, err
+	}
+
+	c := cmd.CommuteCmd{Durationer: r}
 
 	f := flag.NewFlagSet(cmdDefault, flag.ExitOnError)
 	f.StringVar(&c.From, defaultFromParam, cmd.DefaultLocationAlias, defaultFromUsage)

@@ -1,5 +1,9 @@
 package cmd
 
+import (
+	"time"
+)
+
 // Runner defines a type that can be Run.
 type Runner interface {
 	Run(*Configuration, Indicator) error
@@ -34,6 +38,12 @@ type Scanner interface {
 type StorageProvider interface {
 	Load(interface{}) error
 	Save(interface{}) error
+}
+
+// Durationer provides the ability to retrieve the duration between
+// two locations.
+type Durationer interface {
+	Duration(string, string) (*time.Duration, error)
 }
 
 // Configuration represents a Commuter configuration, including

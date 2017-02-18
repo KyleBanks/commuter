@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/KyleBanks/commuter/pkg/geo"
 )
 
 const (
@@ -87,19 +85,14 @@ func (c *ConfigureCmd) String() string {
 type CommuteCmd struct {
 	From string
 	To   string
+
+	Durationer Durationer
 }
 
 // Run calculates the distance between the From and To locations,
 // and outputs the result.
 func (c *CommuteCmd) Run(conf *Configuration, i Indicator) error {
-	// TODO: This is too tightly coupled, it would be preferrable to
-	// pass the router interface.
-	r, err := geo.NewRouter(conf.APIKey)
-	if err != nil {
-		return err
-	}
-
-	d, err := r.Duration(c.From, c.To)
+	d, err := c.Durationer.Duration(c.From, c.To)
 	if err != nil {
 		return err
 	}
