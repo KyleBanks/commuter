@@ -1,8 +1,12 @@
 # Build and run the commuter CLI.
 commuter:
 	@go build github.com/KyleBanks/commuter/cmd/commuter
-	@./commuter -to "Toronto, Canada"
 .PHONY: commuter
+
+# Runs an example commuter request for travel duration.
+example: | commuter
+	@./commuter -to "Toronto, Canada"
+.PHONY: example
 
 # Runs test suit, vet, golint, and fmt.
 sanity:

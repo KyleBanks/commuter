@@ -17,6 +17,13 @@ type FileStore struct {
 	Filename string
 }
 
+// NewFileStore returns an initialized FileStore.
+func NewFileStore(f string) *FileStore {
+	return &FileStore{
+		Filename: f,
+	}
+}
+
 // Load attempts to read and decode the storage file into the
 // value provided.
 func (f FileStore) Load(v interface{}) error {

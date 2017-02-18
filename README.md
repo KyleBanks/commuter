@@ -30,38 +30,38 @@ $ commuter
 > Enter Default Location: 123 Main St. Toronto, Ontario
 ```
 
-The API key and default location will be stored locally, and are never sent to any remote services aside from the official Google Maps API. The default location is then used by default when a `--from` location is not provided.
+The API key and default location will be stored locally, and are never sent to any remote services aside from the official Google Maps API. The default location is then used by default when a `-from` or `-to` location is not provided.
 
 Next, request your commute time:
 
 ```sh
-$ commuter --to "321 Maple Ave. Toronto, Ontario"
+# Default to a location
+$ commuter -to "321 Maple Ave. Toronto, Ontario"
 > 32 Minutes
+
+# A location to your default
+$ commuter -from "Toronto, Ontario"
+> 20 Minutes
 ```
 
-If you want a commute time beginning somewhere other than your default location, you can use the `--from` flag:
+If you want a commute time beginning and ending somewhere other than your default location, you can use supply full locations for both the `-from` and `-to` flags:
 
 ```sh
-$ commuter --from "123 Main St. Toronto, Ontario" --to "321 Maple Ave. Toronto, Ontario"
+$ commuter -from "123 Main St. Toronto, Ontario" -to "321 Maple Ave. Toronto, Ontario"
 > 32 Minutes
 ```
 
 You can also add names for your frequent locations like so:
 
 ```sh
-$ commuter add --name home --address "123 Main St. Toronto, Ontario"
-$ commuter add --name work --address "321 Maple Ave. Toronto, Ontario"
+$ commuter add -name home -location "123 Main St. Toronto, Ontario"
+$ commuter add -name work -address "321 Maple Ave. Toronto, Ontario"
 ```
 
-And use them as the `from` and/or `to` address:
+And use them as the `from` and/or `to` location:
 
 ```sh
-$ commuter --from home --to work
+$ commuter -from home -to work
 > 32 Minutes
 ```
-
-## Roadmap
-
-- Use geolocation to allow requesting commute time from current location (ex. `commuter -c --to 123 Main St.`) where `-c` denotes to use the current location.
-- Allow for alternative modes of transportation (default is driving) via `--drive`, `--walk`, `--bike`, and `--transit` flags.
 
