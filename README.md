@@ -7,15 +7,13 @@ Get commute times on the command line!
 
 ## Install
 
-If you have a working Go installation, you can install `commuter` like so:
+Download the appropriate `commuter` binary from the [Releases](https://github.com/KyleBanks/commuter/releases) page.
+
+Alternatively, if you have a working Go installation, you can install `commuter` like so:
 
 ```sh
 $ go get github.com/KyleBanks/commuter
 ```
-
-Otherwise, download `commuter` from the [Releases](https://github.com/KyleBanks/commuter/releases) page.
-
-Run `commuter -help` to ensure you have properly installed the application.
 
 ## Usage
 
