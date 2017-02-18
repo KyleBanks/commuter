@@ -1,10 +1,10 @@
-# Build and run the commuter CLI.
-commuter:
+# Builds the commuter CLI.
+build:
 	@go build github.com/KyleBanks/commuter/cmd/commuter 
-.PHONY: commuter
+.PHONY: build
 
 # Runs an example commuter request for travel duration.
-example: | commuter
+example: | build
 	@./commuter -to "Toronto, Canada"
 .PHONY: example
 
