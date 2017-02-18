@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/KyleBanks/commuter/pkg/geo"
 	"github.com/KyleBanks/commuter/pkg/storage"
@@ -79,8 +81,35 @@ func (c *CommuteCmd) Run(conf *Configuration, i Indicator) error {
 		return err
 	}
 
-	i.Indicate(d)
+	i.Indicate(c.format(*d))
 	return nil
+}
+
+// format takes a duration and returns a formatter representation.
+func (c *CommuteCmd) format(d time.Duration) string {
+	var out []string
+	hours := int(d.Hours())
+	minutes := int(d.Minutes())
+
+	if hours > 0 {
+		minutes -= (hours * 60)
+
+		var suffix string
+		if hours != 1 {
+			suffix = "s"
+		}
+
+		out = append(out, fmt.Sprintf("%v Hour%v", hours, suffix))
+	}
+
+	var suffix string
+	if minutes != 1 {
+		suffix = "s"
+	}
+
+	out = append(out, fmt.Sprintf("%v Minute%v", minutes, suffix))
+
+	return strings.Join(out, " ")
 }
 
 // Validate validates the CommuteCmd is properly initialized and ready to be Run.
