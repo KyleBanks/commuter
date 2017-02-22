@@ -2,182 +2,73 @@
 package cmd
 
 import (
-	"errors"
-	"fmt"
-	"strings"
 	"time"
 )
 
-const (
-	// DefaultLocationAlias is the name of the default alias
-	// used for 'From' addresses when one is not provided.
-	DefaultLocationAlias = "default"
-
-	// promptPrefix is the prefix using when prompting a user for input.
-	promptPrefix = "> "
-
-	// MsgGoogleMapsAPIKeyPrompt is used to prompt the user to enter their Google Maps API Key.
-	MsgGoogleMapsAPIKeyPrompt = promptPrefix + "Enter Google Maps API Key: (developers.google.com/console)"
-	// MsgDefaultLocationPrompt is used to prompt the user to enter their default location.
-	MsgDefaultLocationPrompt = promptPrefix + "Enter Your Default Location: (ex. 123 Main St. Toronto, Canada)"
-)
-
-var (
-	// ErrDefaultFromMissing is returned when running the default command the the -from arugment is missing.
-	ErrDefaultFromMissing = errors.New("missing -from parameter")
-	// ErrDefaultToMissing is returned when running the default command the the -to arugment is missing.
-	ErrDefaultToMissing = errors.New("missing -to parameter")
-
-	// ErrAddNameMissing is returned when running the add command the the -name arugment is missing.
-	ErrAddNameMissing = errors.New("missing -name parameter")
-	// ErrAddLocationMissing is returned when running the add command the the -location arugment is missing.
-	ErrAddLocationMissing = errors.New("missing -location parameter")
-)
-
-// ConfigureCmd is used to configure the commuter application
-type ConfigureCmd struct {
-	Input Scanner
-	Store StorageProvider
+// Configuration represents a Commuter configuration, including
+// the Google Maps API Key and location map.
+type Configuration struct {
+	APIKey    string
+	Locations map[string]string
 }
 
-// Run prompts the user to configure the commuter application.
-func (c *ConfigureCmd) Run(conf *Configuration, i Indicator) error {
-	conf = &Configuration{
-		APIKey: c.promptForString(i, MsgGoogleMapsAPIKeyPrompt),
-
-		Locations: map[string]string{
-			DefaultLocationAlias: c.promptForString(i, MsgDefaultLocationPrompt),
-		},
-	}
-
-	return c.Store.Save(&conf)
-}
-
-// Validate validates the ConfigureCmd is properly initialized and ready to be Run.
-func (c *ConfigureCmd) Validate(conf *Configuration) error {
-	return nil
-}
-
-// promptForString prompts the user for a string input.
-func (c *ConfigureCmd) promptForString(i Indicator, msg string) string {
-	i.Indicate(msg)
-
-	var in string
-	for c.Input.Scan() {
-		in = c.Input.Text()
-		if len(in) == 0 {
-			continue
-		}
-
-		break
-	}
-
-	return in
-}
-
-// String returns a string representation of the ConfigureCmd.
-func (c *ConfigureCmd) String() string {
-	return "Configure"
-}
-
-// CommuteCmd represents the standard command to
-// retrieve the commute time between two locations.
-type CommuteCmd struct {
-	From string
-	To   string
-
-	Durationer Durationer
-}
-
-// Run calculates the distance between the From and To locations,
-// and outputs the result.
-func (c *CommuteCmd) Run(conf *Configuration, i Indicator) error {
-	d, err := c.Durationer.Duration(c.From, c.To)
+// NewConfiguration attempts to retrieve a Configuration from a storage Provider.
+//
+// If an error occurs, the configuration is assumed to be corrupted and a nil
+// Configuration is returned.
+func NewConfiguration(s StorageProvider) *Configuration {
+	var c Configuration
+	err := s.Load(&c)
 	if err != nil {
-		return err
+		return nil
 	}
 
-	i.Indicate(c.format(*d))
-	return nil
+	return &c
 }
 
-// format takes a duration and returns a formatter representation.
-func (c *CommuteCmd) format(d time.Duration) string {
-	var out []string
-	hours := int(d.Hours())
-	minutes := int(d.Minutes())
-
-	if hours > 0 {
-		minutes -= (hours * 60)
-
-		var suffix string
-		if hours != 1 {
-			suffix = "s"
-		}
-
-		out = append(out, fmt.Sprintf("%v Hour%v", hours, suffix))
-	}
-
-	var suffix string
-	if minutes != 1 {
-		suffix = "s"
-	}
-	out = append(out, fmt.Sprintf("%v Minute%v", minutes, suffix))
-
-	return strings.Join(out, " ")
+// Runner defines a type that can be Run.
+type Runner interface {
+	Run(*Configuration, Indicator) error
 }
 
-// Validate validates the CommuteCmd is properly initialized and ready to be Run.
-func (c *CommuteCmd) Validate(conf *Configuration) error {
-	if val, ok := conf.Locations[c.From]; ok {
-		c.From = val
-	}
-	if val, ok := conf.Locations[c.To]; ok {
-		c.To = val
-	}
-
-	if len(c.From) == 0 {
-		return ErrDefaultFromMissing
-	}
-	if len(c.To) == 0 {
-		return ErrDefaultToMissing
-	}
-
-	return nil
+// Validator defines a type that can be validated.
+type Validator interface {
+	Validate(*Configuration) error
 }
 
-// String returns a string representation of the CommuteCmd.
-func (c *CommuteCmd) String() string {
-	return fmt.Sprintf("From '%v' to '%v'", c.From, c.To)
+// RunnerValidator defines a type that can be Run and Validated.
+type RunnerValidator interface {
+	Runner
+	Validator
 }
 
-// AddCmd represents a command to add a named location.
-type AddCmd struct {
-	Name  string
-	Value string
-
-	Store StorageProvider
+// Indicator defines a type that can provide UI indications
+// to the user.
+type Indicator interface {
+	Indicate(string, ...interface{})
 }
 
-// Run adds the named location, overwriting the existing value if necessary.
-func (a *AddCmd) Run(conf *Configuration, i Indicator) error {
-	conf.Locations[a.Name] = a.Value
-	return a.Store.Save(conf)
+// Scanner represents an input scanner that can read lines
+// of input from the user.
+type Scanner interface {
+	Scan() bool
+	Text() string
 }
 
-// Validate validates the AddCmd is properly initialized and ready to be Run.
-func (a *AddCmd) Validate(conf *Configuration) error {
-	if len(a.Name) == 0 {
-		return ErrAddNameMissing
-	}
-	if len(a.Value) == 0 {
-		return ErrAddLocationMissing
-	}
-
-	return nil
+// StorageProvider defines a type that can be used for storage.
+type StorageProvider interface {
+	Load(interface{}) error
+	Save(interface{}) error
 }
 
-// String returns a string representation of the AddCmd.
-func (a *AddCmd) String() string {
-	return fmt.Sprintf("Adding named location '%v' with value '%v'", a.Name, a.Value)
+// Durationer provides the ability to retrieve the duration between
+// two locations.
+type Durationer interface {
+	Duration(string, string) (*time.Duration, error)
+}
+
+// Locator provides the ability to retrieve the current location as
+// a Latitude and Longitude.
+type Locator interface {
+	CurrentLocation() (float64, float64, error)
 }

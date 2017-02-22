@@ -54,11 +54,18 @@ func TestArgParser_Parse(t *testing.T) {
 		{[]string{"-to", "123 Etc Ave.", "-from", "home"}, &conf, &cmd.CommuteCmd{}},
 		{[]string{"-to", "work", "-from", "123 Etc Ave."}, &conf, &cmd.CommuteCmd{}},
 		{[]string{"-to", "321 Example Drive", "-from", "123 Etc Ave."}, &conf, &cmd.CommuteCmd{}},
+		{[]string{"-to", "321 Example Drive", "-from-current"}, &conf, &cmd.CommuteCmd{}},
+		{[]string{"-to-current", "-from", "123 Etc Ave."}, &conf, &cmd.CommuteCmd{}},
+		{[]string{"-to-current", "-from-current"}, &conf, &cmd.CommuteCmd{}},
 
 		// Add command
 		{[]string{"add"}, &conf, &cmd.AddCmd{}},
 		{[]string{"add", "-name", "work"}, &conf, &cmd.AddCmd{}},
 		{[]string{"add", "-name", "work", "-location", "123 Sample Lane"}, &conf, &cmd.AddCmd{}},
+
+		// List command
+		{[]string{"list"}, &conf, &cmd.ListCmd{}},
+		{[]string{"list", "-arg"}, &conf, &cmd.ListCmd{}},
 
 		// Empty args should prompt a ConfigureCommand
 		{[]string{}, &conf, &cmd.ConfigureCmd{}},
@@ -121,6 +128,9 @@ func TestArgParser_parseCommuteCmd(t *testing.T) {
 		{[]string{"-to", "123 Etc Ave.", "-from", "home"}, cmd.CommuteCmd{To: "123 Etc Ave.", From: "home"}},
 		{[]string{"-to", "work", "-from", "123 Etc Ave."}, cmd.CommuteCmd{To: "work", From: "123 Etc Ave."}},
 		{[]string{"-to", "321 Example Drive", "-from", "123 Etc Ave."}, cmd.CommuteCmd{To: "321 Example Drive", From: "123 Etc Ave."}},
+		{[]string{"-to", "321 Example Drive", "-from-current"}, cmd.CommuteCmd{To: "321 Example Drive", FromCurrent: true, From: "default"}},
+		{[]string{"-to-current", "-from", "123 Etc Ave."}, cmd.CommuteCmd{ToCurrent: true, From: "123 Etc Ave.", To: "default"}},
+		{[]string{"-to-current", "-from-current"}, cmd.CommuteCmd{ToCurrent: true, FromCurrent: true, To: "default", From: "default"}},
 	}
 
 	for idx, tt := range tests {
@@ -133,8 +143,14 @@ func TestArgParser_parseCommuteCmd(t *testing.T) {
 			t.Fatalf("[%v] Unexpected 'To' parsed, expected=%v, got=%v", idx, tt.expected.To, r.To)
 		} else if tt.expected.From != r.From {
 			t.Fatalf("[%v] Unexpected 'From' parsed, expected=%v, got=%v", idx, tt.expected.From, r.From)
+		} else if tt.expected.FromCurrent != r.FromCurrent {
+			t.Fatalf("[%v] Unexpected 'FromCurrent' parsed, expected=%v, got=%v", idx, tt.expected.FromCurrent, r.FromCurrent)
+		} else if tt.expected.ToCurrent != r.ToCurrent {
+			t.Fatalf("[%v] Unexpected 'ToCurrent' parsed, expected=%v, got=%v", idx, tt.expected.ToCurrent, r.ToCurrent)
 		} else if r.Durationer == nil {
 			t.Fatalf("[%v] Unexpected nil Durationer", idx)
+		} else if r.Locator == nil {
+			t.Fatalf("[%v] Unexpected nil Locator", idx)
 		}
 	}
 }

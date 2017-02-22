@@ -10,17 +10,23 @@ import (
 )
 
 const (
-	cmdDefault       = "commuter"
-	defaultFromParam = "from"
-	defaultFromUsage = `The starting point of your commute, either a named location [ex. "work"] or an address [ex. "123 Main St. Toronto, Canada"].`
-	defaultToParam   = "to"
-	defaultToUsage   = `The destination of your commute, either a named location [ex. "work"] or an address [ex. "123 Main St. Toronto, Canada"].`
+	cmdDefault              = "commuter"
+	defaultFromParam        = "from"
+	defaultFromUsage        = "The starting point of your commute, either a named location [ex. 'work'] or an address [ex. '123 Main St. Toronto, Canada']."
+	defaultToParam          = "to"
+	defaultToUsage          = "The destination of your commute, either a named location [ex. 'work'] or an address [ex. '123 Main St. Toronto, Canada']."
+	defaultFromCurrentParam = "from-current"
+	defaultFromCurrentUsage = "Sets your current location as the starting point of your commute. This uses Geolocation to attempt to determine your Latitude/Longitude based on IP Address. [Accuracy may vary]"
+	defaultToCurrentParam   = "to-current"
+	defaultToCurrentUsage   = "Sets your current location as the destination of your commute. This uses Geolocation to attempt to determine your Latitude/Longitude based on IP Address. [Accuracy may vary]"
 
 	cmdAdd           = "add"
 	addNameParam     = "name"
-	addNameUsage     = `The name of the location you'd like to add [ex. "work"]. (required)`
+	addNameUsage     = `The name of the location you'd like to add [ex. "work"]. (required)\n`
 	addLocationParam = "location"
-	addLocationUsage = `The location to be added [ex. "123 Main St. Toronto, Canada"]. (required)`
+	addLocationUsage = `The location to be added [ex. "123 Main St. Toronto, Canada"]. (required)\n`
+
+	cmdList = "list"
 )
 
 // Stdout provides an output mechanism to notify the user via stdout.
@@ -36,12 +42,7 @@ func NewStdout() Stdout {
 }
 
 // Indicate prints an indication to the user.
-func (s Stdout) Indicate(v interface{}) {
-	s.Indicatef("%v", v)
-}
-
-// Indicatef prints an indication to the user with formatting.
-func (s Stdout) Indicatef(msg string, args ...interface{}) {
+func (s Stdout) Indicate(msg string, args ...interface{}) {
 	fmt.Fprintf(s, "%v\n", fmt.Sprintf(msg, args...))
 }
 

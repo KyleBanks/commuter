@@ -23,7 +23,7 @@ $ go get github.com/KyleBanks/commuter
 
 The first time you run `commuter`, you'll be prompted to provide a [Google Maps API Key](https://developers.google.com/console) and default location. 
 
-**Important:** Ensure you enable the *Google Maps Distance Matrix API* at [https://developers.google.com/console](https://developers.google.com/console).
+**Important:** Ensure you enable the *Google Maps Distance Matrix API* at [developers.google.com/console](https://developers.google.com/console). If you want to use the `-from-current` and `-to-current` flags, you will also need to enable the *Google Maps Geolocation API*.
 
 ```sh
 $ commuter
@@ -40,19 +40,21 @@ Next, request your commute time:
 ```sh
 # From your default to a specific location:
 $ commuter -to "321 Maple Ave. Toronto, Ontario"
-> 32 Minutes
+32 Minutes
 
 # From a specific location to your default:
 $ commuter -from "Toronto, Ontario"
-> 20 Minutes
+20 Minutes
 ```
 
 If you want a commute time beginning and ending somewhere other than your default location, you can use supply full locations for both the `-from` and `-to` flags:
 
 ```sh
 $ commuter -from "123 Main St. Toronto, Ontario" -to "321 Maple Ave. Toronto, Ontario"
-> 32 Minutes
+32 Minutes
 ```
+
+### `commuter add`
 
 You can also add names for your frequent locations like so:
 
@@ -65,7 +67,29 @@ And use them as the `from` and/or `to` location:
 
 ```sh
 $ commuter -from home -to work
-> 32 Minutes
+32 Minutes
+```
+
+### `commuter list`
+
+To see a list of all your named locations:
+
+```sh
+& commuter list
+default: 123 Main St. Toronto, Ontario
+    gym: 1024 Fitness Lane Toronto, Ontario
+   work: 321 Maple Ave. Toronto, Ontario
+```
+
+### Using Your Current Location
+
+If you [enabled](https://developers.google.com/console) the *Google Maps Geolocation API* for your API key, you can use the `-from-current` and `-to-current` flags to use your current location. This is done by attempting to use your IP Address to determine your latitude and longitude, and use that as either the start or destination of your commute:
+
+```sh
+$ commuter -from-current -to work
+32 Minutes
+$ commuter -from gym -to-current
+12 Minutes
 ```
 
 ## License

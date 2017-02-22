@@ -2,7 +2,10 @@
 package geo
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/context"
@@ -10,8 +13,11 @@ import (
 )
 
 const (
-	statusOk       string = "OK"
-	statusNotFound string = "NOT_FOUND"
+	statusOk       = "OK"
+	statusNotFound = "NOT_FOUND"
+
+	geolocationURL  = "https://www.googleapis.com/geolocation/v1/geolocate?key="
+	geolocationBody = `{"considerIp": "true"}`
 )
 
 var (
@@ -26,6 +32,8 @@ var (
 
 // Router provides the ability to calculate travel duration between Routes.
 type Router struct {
+	apiKey string
+
 	client Communicator
 }
 
@@ -37,6 +45,7 @@ func NewRouter(apiKey string) (*Router, error) {
 	}
 
 	return &Router{
+		apiKey: apiKey,
 		client: c,
 	}, nil
 }
@@ -66,4 +75,24 @@ func (r Router) Duration(from, to string) (*time.Duration, error) {
 	}
 
 	return nil, ErrUnavailable
+}
+
+// CurrentLocation attempts to use Geolocation to return the Lat/Long of the system device
+// based on it's IP Address.
+func (r Router) CurrentLocation() (float64, float64, error) {
+	resp, err := http.Post(geolocationURL+r.apiKey, "application/json", bytes.NewBuffer([]byte(geolocationBody)))
+	if err != nil {
+		return 0, 0, err
+	}
+	defer resp.Body.Close()
+
+	var loc struct {
+		LatLng *maps.LatLng `json:"location"`
+	}
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&loc); err != nil {
+		return 0, 0, err
+	}
+
+	return loc.LatLng.Lat, loc.LatLng.Lng, nil
 }

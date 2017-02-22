@@ -1,11 +1,11 @@
-# Builds the commuter CLI.
-build:
-	@go build github.com/KyleBanks/commuter 
-.PHONY: build
+# Builds and installs the commuter CLI.
+install:
+	@go install github.com/KyleBanks/commuter 
+.PHONY: install
 
 # Runs an example commuter request for travel duration.
-example: | build
-	@./commuter -to "Toronto, Canada"
+example: | install
+	@commuter -to "Toronto, Canada"
 .PHONY: example
 
 # Runs test suit, vet, golint, and fmt.

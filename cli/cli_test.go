@@ -16,32 +16,6 @@ func TestNewStdout(t *testing.T) {
 
 func TestStdout_Indicate(t *testing.T) {
 	tests := []struct {
-		v        interface{}
-		expected string
-	}{
-		{"", "\n"},
-		{"hey", "hey\n"},
-		{1, "1\n"},
-		{struct{ test string }{"test"}, "{test}\n"},
-	}
-
-	for idx, tt := range tests {
-		var b bytes.Buffer
-		s := Stdout{
-			Writer: &b,
-		}
-
-		s.Indicate(tt.v)
-		out := b.String()
-
-		if out != tt.expected {
-			t.Fatalf("[#%v] Unexpected output, expected=%v, got=%v", idx, tt.expected, out)
-		}
-	}
-}
-
-func TestStdout_Indicatef(t *testing.T) {
-	tests := []struct {
 		msg      string
 		args     []interface{}
 		expected string
@@ -57,7 +31,7 @@ func TestStdout_Indicatef(t *testing.T) {
 			Writer: &b,
 		}
 
-		s.Indicatef(tt.msg, tt.args...)
+		s.Indicate(tt.msg, tt.args...)
 		out := b.String()
 
 		if out != tt.expected {

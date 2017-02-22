@@ -29,6 +29,8 @@ func (a *ArgParser) Parse(conf *cmd.Configuration, s cmd.StorageProvider) (cmd.R
 	switch a.Args[0] {
 	case cmdAdd:
 		return a.parseAddCmd(s, a.Args[1:])
+	case cmdList:
+		return a.parseListCmd(s, a.Args[1:])
 	}
 
 	return a.parseCommuteCmd(conf, a.Args)
@@ -49,11 +51,13 @@ func (a *ArgParser) parseCommuteCmd(conf *cmd.Configuration, args []string) (*cm
 		return nil, err
 	}
 
-	c := cmd.CommuteCmd{Durationer: r}
+	c := cmd.CommuteCmd{Durationer: r, Locator: r}
 
 	f := flag.NewFlagSet(cmdDefault, flag.ExitOnError)
 	f.StringVar(&c.From, defaultFromParam, cmd.DefaultLocationAlias, defaultFromUsage)
+	f.BoolVar(&c.FromCurrent, defaultFromCurrentParam, false, defaultFromCurrentUsage)
 	f.StringVar(&c.To, defaultToParam, cmd.DefaultLocationAlias, defaultToUsage)
+	f.BoolVar(&c.ToCurrent, defaultToCurrentParam, false, defaultToCurrentUsage)
 	f.Parse(args)
 
 	return &c, nil
@@ -69,4 +73,9 @@ func (a *ArgParser) parseAddCmd(s cmd.StorageProvider, args []string) (*cmd.AddC
 	f.Parse(args)
 
 	return &c, nil
+}
+
+// parseListCmd parses and returns a ListCmd.
+func (a *ArgParser) parseListCmd(s cmd.StorageProvider, args []string) (*cmd.ListCmd, error) {
+	return &cmd.ListCmd{}, nil
 }
