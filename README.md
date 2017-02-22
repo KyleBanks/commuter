@@ -8,6 +8,7 @@ Get commute times on the command line!
 
 - Get commuting time between locations.
 - Name and add your frequent locations for easier access.
+- Geolocation allows you to use your current location without typing an address.
 
 ## Install
 
