@@ -75,7 +75,7 @@ $ commuter -from home -to work
 To see a list of all your named locations:
 
 ```sh
-& commuter list
+$ commuter list
 default: 123 Main St. Toronto, Ontario
     gym: 1024 Fitness Lane Toronto, Ontario
    work: 321 Maple Ave. Toronto, Ontario
