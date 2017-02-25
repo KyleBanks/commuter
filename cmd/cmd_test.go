@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"time"
+
+	"github.com/KyleBanks/commuter/pkg/geo"
 )
 
 // mock Indicator
@@ -18,11 +20,11 @@ func (m *mockIndicator) Indicate(msg string, args ...interface{}) {
 // mock Durationer
 
 type mockDurationer struct {
-	durationFn func(string, string) (*time.Duration, error)
+	durationFn func(string, string, geo.TravelMode) (*time.Duration, error)
 }
 
-func (m *mockDurationer) Duration(from, to string) (*time.Duration, error) {
-	return m.durationFn(from, to)
+func (m *mockDurationer) Duration(from, to string, tm geo.TravelMode) (*time.Duration, error) {
+	return m.durationFn(from, to, tm)
 }
 
 // mock StorageProvider

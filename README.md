@@ -93,6 +93,30 @@ $ commuter -from gym -to-current
 12 Minutes
 ```
 
+### Travel Modes
+
+By default, `commuter` assumes you are driving between locations. However, you can specify one or more commute methods using the `-drive`, `-walk`, `-bike` and `-transit` flags, like so:
+
+```sh
+# Single mode:
+$ commuter -walk -to work
+7 Hours 50 Minutes
+
+# Multiple modes:
+$ commuter -walk -transit -drive -bike -to work
+Drive: 30 Minutes
+Walk: 7 Hours 50 Minutes
+Bike: 2 Hours 45 Minutes
+Transit: 1 Hour 17 Minutes
+```
+
+And of course the different travel modes can be combined with your current location:
+
+```sh
+$ commuter -bike -from-current -to gym
+2 Hours 18 Minutes
+```
+
 ## License
 
 ```

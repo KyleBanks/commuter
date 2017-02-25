@@ -118,6 +118,8 @@ func TestArgParser_parseCommuteCmd(t *testing.T) {
 	}
 
 	conf.APIKey = "example"
+
+	// To/From and ToCurrent/FromCurrent
 	tests := []struct {
 		args     []string
 		expected cmd.CommuteCmd
@@ -151,6 +153,41 @@ func TestArgParser_parseCommuteCmd(t *testing.T) {
 			t.Fatalf("[%v] Unexpected nil Durationer", idx)
 		} else if r.Locator == nil {
 			t.Fatalf("[%v] Unexpected nil Locator", idx)
+		} else if r.Drive == false {
+			t.Fatalf("[%v] Unexpected Drive, expected=true, got=false", idx)
+		} else if r.Bike == true || r.Walk == true || r.Transit == true {
+			t.Fatalf("[%v] Unexpected Bike/Walk/Transit, expected=false, got=[%v, %v, %v]", idx, r.Bike, r.Walk, r.Transit)
+		}
+	}
+
+	// Modes
+	mTests := []struct {
+		args     []string
+		expected cmd.CommuteCmd
+	}{
+		{[]string{""}, cmd.CommuteCmd{Drive: true}},
+		{[]string{"-drive"}, cmd.CommuteCmd{Drive: true}},
+		{[]string{"-walk"}, cmd.CommuteCmd{Walk: true}},
+		{[]string{"-bike"}, cmd.CommuteCmd{Bike: true}},
+		{[]string{"-transit"}, cmd.CommuteCmd{Transit: true}},
+		{[]string{"-drive", "-walk"}, cmd.CommuteCmd{Drive: true, Walk: true}},
+		{[]string{"-drive", "-walk", "-bike", "-transit"}, cmd.CommuteCmd{Drive: true, Walk: true, Bike: true, Transit: true}},
+	}
+
+	for idx, tt := range mTests {
+		r, err := a.parseCommuteCmd(&conf, tt.args)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if tt.expected.Drive != r.Drive {
+			t.Fatalf("[%v] Unexpected 'Drive' parsed, expected=%v, got=%v", idx, tt.expected.Drive, r.Drive)
+		} else if tt.expected.Walk != r.Walk {
+			t.Fatalf("[%v] Unexpected 'Walk' parsed, expected=%v, got=%v", idx, tt.expected.Walk, r.Walk)
+		} else if tt.expected.Bike != r.Bike {
+			t.Fatalf("[%v] Unexpected 'Bike' parsed, expected=%v, got=%v", idx, tt.expected.Bike, r.Bike)
+		} else if tt.expected.Transit != r.Transit {
+			t.Fatalf("[%v] Unexpected 'Transit' parsed, expected=%v, got=%v", idx, tt.expected.Transit, r.Transit)
 		}
 	}
 }

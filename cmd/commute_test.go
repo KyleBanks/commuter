@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/KyleBanks/commuter/pkg/geo"
 )
 
 func TestCommuteCmd_Run(t *testing.T) {
-	// Positive
+	// Positive, To/From
 	tests := []struct {
 		from string
 		to   string
@@ -22,7 +24,7 @@ func TestCommuteCmd_Run(t *testing.T) {
 	for idx, tt := range tests {
 		d := time.Minute * 3
 		m := mockDurationer{
-			durationFn: func(from, to string) (*time.Duration, error) {
+			durationFn: func(from, to string, tm geo.TravelMode) (*time.Duration, error) {
 				if from != tt.from {
 					t.Fatalf("[#%v] Unexpected From, expected=%v, got=%v", idx, tt.from, from)
 				} else if to != tt.to {
@@ -33,7 +35,7 @@ func TestCommuteCmd_Run(t *testing.T) {
 			},
 		}
 
-		c := CommuteCmd{From: tt.from, To: tt.to, Durationer: &m}
+		c := CommuteCmd{From: tt.from, To: tt.to, Drive: true, Durationer: &m}
 		var conf Configuration
 		var i mockIndicator
 		if err := c.Run(&conf, &i); err != nil {
@@ -47,16 +49,77 @@ func TestCommuteCmd_Run(t *testing.T) {
 		}
 	}
 
+	// Positive, Modes
+	mTests := []struct {
+		drive   bool
+		walk    bool
+		bike    bool
+		transit bool
+	}{
+		{true, false, false, false},
+		{true, true, false, false},
+		{false, true, false, false},
+		{false, true, true, false},
+		{false, false, true, false},
+		{false, false, true, true},
+		{false, true, true, true},
+		{true, true, true, true},
+	}
+
+	for idx, tt := range mTests {
+		var expectCount int
+		if tt.drive {
+			expectCount++
+		}
+		if tt.walk {
+			expectCount++
+		}
+		if tt.bike {
+			expectCount++
+		}
+		if tt.transit {
+			expectCount++
+		}
+
+		m := mockDurationer{
+			durationFn: func(from, to string, tm geo.TravelMode) (*time.Duration, error) {
+				if tm == geo.Drive && !tt.drive {
+					t.Fatalf("[#%v] Unexpected Mode, Drive", idx)
+				} else if tm == geo.Walk && !tt.walk {
+					t.Fatalf("[#%v] Unexpected Mode, Walk", idx)
+				} else if tm == geo.Bike && !tt.bike {
+					t.Fatalf("[#%v] Unexpected Mode, Bike", idx)
+				} else if tm == geo.Transit && !tt.transit {
+					t.Fatalf("[#%v] Unexpected Mode, Transit", idx)
+				}
+
+				d := time.Minute * 3
+				return &d, nil
+			},
+		}
+
+		c := CommuteCmd{From: "default", To: "default", Drive: tt.drive, Walk: tt.walk, Bike: tt.bike, Transit: tt.transit, Durationer: &m}
+		var conf Configuration
+		var i mockIndicator
+		if err := c.Run(&conf, &i); err != nil {
+			t.Fatal(err)
+		}
+
+		if len(i.out) != expectCount {
+			t.Fatalf("[#%v] Unexpected number of output lines, expected=%v, got=%v", idx, expectCount, i.out)
+		}
+	}
+
 	// Negative
 	{
 		testErr := errors.New("mock error")
 		m := mockDurationer{
-			durationFn: func(from, to string) (*time.Duration, error) {
+			durationFn: func(from, to string, tm geo.TravelMode) (*time.Duration, error) {
 				return nil, testErr
 			},
 		}
 
-		c := CommuteCmd{From: "from", To: "to", Durationer: &m}
+		c := CommuteCmd{From: "from", To: "to", Drive: true, Durationer: &m}
 		var conf Configuration
 		var i mockIndicator
 		if err := c.Run(&conf, &i); err != testErr {
@@ -90,6 +153,7 @@ func TestCommuteCmd_format(t *testing.T) {
 }
 
 func TestCommuteCmd_Validate(t *testing.T) {
+	// From/To
 	tests := []struct {
 		locs        map[string]string
 		from        string
@@ -114,7 +178,7 @@ func TestCommuteCmd_Validate(t *testing.T) {
 		{map[string]string{}, "", false, "to", false, ErrDefaultFromMissing, "", ""},
 		{map[string]string{}, "from", false, "", false, ErrDefaultToMissing, "", ""},
 		{map[string]string{}, "from", true, "", false, ErrFromAndFromCurrentProvided, "", ""},
-		{map[string]string{}, "", false, "to", true, ErrToAndToCurrentProvided, "", ""},
+		{map[string]string{}, "from", false, "to", true, ErrToAndToCurrentProvided, "", ""},
 		{map[string]string{"from": ""}, "from", false, "to", false, ErrDefaultFromMissing, "", ""},
 		{map[string]string{"to": ""}, "from", false, "to", false, ErrDefaultToMissing, "", ""},
 	}
@@ -137,7 +201,7 @@ func TestCommuteCmd_Validate(t *testing.T) {
 				return float64(idx), float64(idx), nil
 			},
 		}
-		c := CommuteCmd{From: tt.from, FromCurrent: tt.fromCurrent, To: tt.to, ToCurrent: tt.toCurrent, Locator: &m}
+		c := CommuteCmd{From: tt.from, FromCurrent: tt.fromCurrent, To: tt.to, ToCurrent: tt.toCurrent, Locator: &m, Drive: true}
 
 		if err := c.Validate(&conf); err != tt.err {
 			t.Fatalf("[#%v] Unexpected error, expected=%v, got=%v", idx, tt.err, err)
@@ -151,6 +215,34 @@ func TestCommuteCmd_Validate(t *testing.T) {
 			t.Fatalf("[#%v] Unexpected From, expected=%v, got=%v", idx, tt.expectFrom, c.From)
 		} else if c.To != tt.expectTo {
 			t.Fatalf("[#%v] Unexpected To, expected=%v, got=%v", idx, tt.expectTo, c.To)
+		}
+	}
+
+	// Modes
+	cTests := []struct {
+		drive   bool
+		walk    bool
+		bike    bool
+		transit bool
+
+		err error
+	}{
+		{true, false, false, false, nil},
+		{true, true, false, false, nil},
+		{true, true, true, false, nil},
+		{true, true, true, true, nil},
+		{false, true, true, true, nil},
+		{false, false, true, true, nil},
+		{false, false, false, true, nil},
+		{false, false, false, false, ErrNoCommuteMethod},
+	}
+
+	for idx, tt := range cTests {
+		conf := Configuration{Locations: make(map[string]string)}
+
+		c := CommuteCmd{From: "default", To: "default", Drive: tt.drive, Walk: tt.walk, Bike: tt.bike, Transit: tt.transit}
+		if err := c.Validate(&conf); err != tt.err {
+			t.Fatalf("[#%v] Unexpected error, expected=%v, got=%v", idx, tt.err, err)
 		}
 	}
 }

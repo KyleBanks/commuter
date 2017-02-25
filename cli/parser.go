@@ -53,12 +53,22 @@ func (a *ArgParser) parseCommuteCmd(conf *cmd.Configuration, args []string) (*cm
 
 	c := cmd.CommuteCmd{Durationer: r, Locator: r}
 
-	f := flag.NewFlagSet(cmdDefault, flag.ExitOnError)
-	f.StringVar(&c.From, defaultFromParam, cmd.DefaultLocationAlias, defaultFromUsage)
-	f.BoolVar(&c.FromCurrent, defaultFromCurrentParam, false, defaultFromCurrentUsage)
-	f.StringVar(&c.To, defaultToParam, cmd.DefaultLocationAlias, defaultToUsage)
-	f.BoolVar(&c.ToCurrent, defaultToCurrentParam, false, defaultToCurrentUsage)
+	f := flag.NewFlagSet(cmdCommute, flag.ExitOnError)
+	f.StringVar(&c.From, commuteFromParam, cmd.DefaultLocationAlias, commuteFromUsage)
+	f.BoolVar(&c.FromCurrent, commuteFromCurrentParam, false, commuteFromCurrentUsage)
+	f.StringVar(&c.To, commuteToParam, cmd.DefaultLocationAlias, commuteToUsage)
+	f.BoolVar(&c.ToCurrent, commuteToCurrentParam, false, commuteToCurrentUsage)
+
+	f.BoolVar(&c.Drive, commuteDriveParam, false, commuteDriveUsage)
+	f.BoolVar(&c.Walk, commuteWalkParam, false, commuteWalkUsage)
+	f.BoolVar(&c.Bike, commuteBikeParam, false, commuteBikeUsage)
+	f.BoolVar(&c.Transit, commuteTransitParam, false, commuteTransitUsage)
 	f.Parse(args)
+
+	// Only default drive to true when no other methods of transport are selected.
+	if !c.Walk && !c.Bike && !c.Transit {
+		c.Drive = true
+	}
 
 	return &c, nil
 }

@@ -43,6 +43,7 @@ func TestRouter_Duration(t *testing.T) {
 		from := "321 Main St"
 		to := "123 Maple St"
 		duration := time.Minute * 5
+		mode := Drive
 		mc.distanceFn = func(c context.Context, r *maps.DistanceMatrixRequest) (*maps.DistanceMatrixResponse, error) {
 			if c == nil {
 				t.Fatal("Unexpected nil Context")
@@ -53,6 +54,12 @@ func TestRouter_Duration(t *testing.T) {
 			}
 			if len(r.Destinations) != 1 || r.Destinations[0] != to {
 				t.Fatalf("Unexpected Destinations, expected=%v, got=%v", to, r.Destinations)
+			}
+			if r.Mode != maps.Mode(mode) {
+				t.Fatalf("Unexpected Mode, expected=%v, got=%v", mode, r.Mode)
+			}
+			if r.Avoid != defaultAvoid {
+				t.Fatalf("Unexpected Avoid, expected=%v, got=%v", defaultAvoid, r.Avoid)
 			}
 
 			return &maps.DistanceMatrixResponse{
@@ -69,7 +76,7 @@ func TestRouter_Duration(t *testing.T) {
 			}, nil
 		}
 
-		d, err := r.Duration(from, to)
+		d, err := r.Duration(from, to, mode)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -86,7 +93,7 @@ func TestRouter_Duration(t *testing.T) {
 			return nil, e
 		}
 
-		_, err := r.Duration("", "")
+		_, err := r.Duration("", "", Drive)
 		if err != e {
 			t.Fatalf("Unexpected error returned, expected=%v, got=%v", e, err)
 		}
@@ -108,7 +115,7 @@ func TestRouter_Duration(t *testing.T) {
 			}, nil
 		}
 
-		_, err := r.Duration("", "")
+		_, err := r.Duration("", "", Drive)
 		if err != ErrBadLocation {
 			t.Fatalf("Unexpected error returned, expected=%v, got=%v", ErrBadLocation, err)
 		}
@@ -120,7 +127,7 @@ func TestRouter_Duration(t *testing.T) {
 			return &maps.DistanceMatrixResponse{}, nil
 		}
 
-		_, err := r.Duration("", "")
+		_, err := r.Duration("", "", Drive)
 		if err != ErrUnavailable {
 			t.Fatalf("Unexpected error returned, expected=%v, got=%v", ErrUnavailable, err)
 		}

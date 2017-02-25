@@ -3,6 +3,8 @@ package cmd
 
 import (
 	"time"
+
+	"github.com/KyleBanks/commuter/pkg/geo"
 )
 
 // Configuration represents a Commuter configuration, including
@@ -64,7 +66,7 @@ type StorageProvider interface {
 // Durationer provides the ability to retrieve the duration between
 // two locations.
 type Durationer interface {
-	Duration(string, string) (*time.Duration, error)
+	Duration(string, string, geo.TravelMode) (*time.Duration, error)
 }
 
 // Locator provides the ability to retrieve the current location as

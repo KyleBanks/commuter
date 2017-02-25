@@ -27,7 +27,7 @@ func main() {
 	exec(out, conf, r)
 }
 
-// exec validates executes a Runner with the Indicator and Configuration provided.
+// exec validates and executes a Runner with the Indicator and Configuration provided.
 func exec(i cmd.Indicator, c *cmd.Configuration, r cmd.RunnerValidator) {
 	if err := r.Validate(c); err != nil {
 		i.Indicate("Invalid command: %v", r)
