@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/KyleBanks/commuter.svg?branch=master)](https://travis-ci.org/KyleBanks/commuter) &nbsp;
 [![GoDoc](https://godoc.org/github.com/KyleBanks/commuter?status.svg)](https://godoc.org/github.com/KyleBanks/commuter) &nbsp;
-[![Go Report Card](https://goreportcard.com/badge/github.com/KyleBanks/commuter)](https://goreportcard.com/report/github.com/KyleBanks/commuter)
+[![Go Report Card](https://goreportcard.com/badge/github.com/KyleBanks/commuter)](https://goreportcard.com/report/github.com/KyleBanks/commuter) &nbsp;
+[![Coverage Status](https://coveralls.io/repos/github/KyleBanks/commuter/badge.svg?branch=master)](https://coveralls.io/github/KyleBanks/commuter?branch=master)
 
 Get commute times on the command line!
 
