@@ -5,7 +5,7 @@ import (
 
 	"github.com/KyleBanks/commuter/cli"
 	"github.com/KyleBanks/commuter/cmd"
-	"github.com/KyleBanks/commuter/pkg/storage"
+	"github.com/KyleBanks/go-kit/storage"
 )
 
 const (
